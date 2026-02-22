@@ -1,0 +1,108 @@
+# みんなのまちAI風 — データセットレジストリ
+# 全てのデータソースの定義（出典、ライセンス、更新頻度、取得方法）
+
+datasets:
+
+  # --- 人口・世帯 ---
+  population_census:
+    name: 国勢調査
+    source: e-Stat
+    url: https://www.e-stat.go.jp/
+    license: CC-BY 4.0 (政府統計)
+    update_frequency: 5年 (次回: 2025年)
+    api: e-Stat API v3
+    description: 人口・世帯の基本統計。メッシュ(500m/1km)・小地域集計。
+    usage:
+      - 人口分布レイヤ (Explore A-1)
+      - 恩恵人口計算 (Scenario B-5)
+      - 重力モデル発地量 (Simulation)
+
+  # --- 産業・経済 ---
+  economic_census:
+    name: 経済センサス
+    source: e-Stat
+    url: https://www.e-stat.go.jp/
+    license: CC-BY 4.0 (政府統計)
+    update_frequency: 3〜5年
+    api: e-Stat API v3
+    description: 事業所数・従業者数・売上高。産業分類別。
+
+  # --- 建物 ---
+  osm_buildings:
+    name: OpenStreetMap 建物
+    source: OpenStreetMap
+    url: https://www.openstreetmap.org/
+    license: ODbL
+    update_frequency: リアルタイム
+    api: Overpass API / OSMnx
+    description: 建物フットプリント。用途・階数情報（一部）。
+    attribution: "© OpenStreetMap contributors"
+
+  plateau_buildings:
+    name: PLATEAU 建築物モデル
+    source: Project PLATEAU (国土交通省)
+    url: https://www.geospatial.jp/ckan/dataset/plateau
+    license: CC-BY 4.0
+    update_frequency: 年次 (対象都市拡大中)
+    api: CKAN API
+    description: 3D都市モデル。建物のLOD1/LOD2データ（用途、階数、高さ）。
+
+  # --- 道路 ---
+  osm_roads:
+    name: OpenStreetMap 道路ネットワーク
+    source: OpenStreetMap
+    url: https://www.openstreetmap.org/
+    license: ODbL
+    update_frequency: リアルタイム
+    api: OSMnx
+    description: 道路ネットワークグラフ。到達圏・ルート計算に使用。
+    attribution: "© OpenStreetMap contributors"
+
+  # --- 公共交通 ---
+  osm_transit:
+    name: OpenStreetMap 公共交通
+    source: OpenStreetMap
+    url: https://www.openstreetmap.org/
+    license: ODbL
+    update_frequency: リアルタイム
+    api: Overpass API / OSMnx
+    description: 鉄道駅・バス停の位置情報。
+    attribution: "© OpenStreetMap contributors"
+
+  # --- POI ---
+  osm_poi:
+    name: OpenStreetMap POI
+    source: OpenStreetMap
+    url: https://www.openstreetmap.org/
+    license: ODbL
+    update_frequency: リアルタイム
+    api: Overpass API / OSMnx
+    description: 施設・店舗・観光地等のPOI。重力モデルの魅力度計算に使用。
+    attribution: "© OpenStreetMap contributors"
+
+  # --- 行政界 ---
+  admin_boundary:
+    name: 行政区域
+    source: 国土数値情報 / OpenStreetMap
+    url: https://nlftp.mlit.go.jp/ksj/
+    license: CC-BY 4.0 / ODbL
+    update_frequency: 年次
+    description: 市区町村・町丁目の境界ポリゴン。
+
+  # --- 防災 ---
+  hazard_map:
+    name: ハザードマップ
+    source: 国土数値情報 / ハザードマップポータル
+    url: https://disaportal.gsi.go.jp/
+    license: CC-BY 4.0
+    update_frequency: 不定期
+    description: 浸水想定区域、土砂災害警戒区域等。
+
+  # --- 観光 ---
+  tourism_stats:
+    name: 観光統計
+    source: 観光庁 / 各自治体
+    url: https://www.mlit.go.jp/kankocho/siryou/toukei/
+    license: 政府統計 (利用自由)
+    update_frequency: 年次
+    description: 観光入込客数、消費額等。

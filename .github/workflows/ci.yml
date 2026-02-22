@@ -1,0 +1,70 @@
+name: CI - みんなのまちAI風
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Test 1 - Reproducibility (同一ジョブ→同一結果)
+        run: |
+          python -c "
+          from src.llm.budget_generator import _mock_budget_result
+          r1 = _mock_budget_result('test-001', 'テスト')
+          r2 = _mock_budget_result('test-001', 'テスト')
+          assert len(r1.proposals) == len(r2.proposals), 'Reproducibility failed'
+          assert len(r1.evidences) == len(r2.evidences), 'Reproducibility failed'
+          for p1, p2 in zip(r1.proposals, r2.proposals):
+              assert p1.plan_id == p2.plan_id
+              assert p1.title == p2.title
+          print('✅ Reproducibility test passed')
+          "
+
+      - name: Test 2 - Evidence Binding (根拠拘束)
+        run: |
+          python -c "
+          from src.llm.budget_generator import _mock_budget_result
+          result = _mock_budget_result('test-002', 'テスト')
+          evidence_ids = {e.evidence_id for e in result.evidences}
+          for proposal in result.proposals:
+              for eid in proposal.evidence_ids:
+                  assert eid in evidence_ids, f'Evidence {eid} not found'
+          print('✅ Evidence binding test passed')
+          "
+
+      - name: Test 3 - Attribution Check (出典チェック)
+        run: |
+          python -c "
+          import yaml
+          with open('data_registry/datasets.yaml') as f:
+              registry = yaml.safe_load(f)
+          datasets = registry.get('datasets', {})
+          for name, ds in datasets.items():
+              assert 'license' in ds, f'{name}: license missing'
+              assert 'source' in ds, f'{name}: source missing'
+              assert 'url' in ds or 'api' in ds, f'{name}: url or api missing'
+          print(f'✅ Attribution check passed ({len(datasets)} datasets)')
+          "
+
+      - name: Lint
+        run: |
+          pip install ruff
+          ruff check src/ services/ app/ --ignore E501
