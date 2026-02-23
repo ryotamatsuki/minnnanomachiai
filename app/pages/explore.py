@@ -43,7 +43,7 @@ def render_explore():
         st.markdown("### レイヤ選択")
         selected_layers = []
         for layer_id, layer_info in LAYERS.items():
-            if st.checkbox(layer_info["name"], value=(layer_id == "boundary"), key=f"layer_{layer_id}"):
+            if st.checkbox(layer_info["name"], value=False, key=f"layer_{layer_id}"):
                 selected_layers.append(layer_id)
 
         st.markdown("---")
@@ -138,8 +138,9 @@ def render_explore():
         _render_comparison_chart()
 
 
+@st.cache_data(show_spinner=False, ttl=3600)
 def _load_layer(layer_id: str, place_name: str):
-    """Load a data layer."""
+    """Load a data layer (cached for 1 hour)."""
     if layer_id == "poi":
         from src.connectors.osm import get_pois
         return get_pois(place_name)

@@ -9,14 +9,20 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Optional
 
-import google.generativeai as genai
-
 from src.config import GEMINI_API_KEY, GEMINI_MODEL
 
+genai = None
 
-# Configure Gemini
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+
+def _get_genai():
+    """Lazy-load and configure google.generativeai."""
+    global genai
+    if genai is None:
+        import google.generativeai as _genai
+        if GEMINI_API_KEY:
+            _genai.configure(api_key=GEMINI_API_KEY)
+        genai = _genai
+    return genai
 
 
 @dataclass
@@ -134,14 +140,15 @@ def generate_budget_draft(
     user_message += "\n\n上記に基づいて、JSON形式で3案の予算案を作成してください。"
 
     try:
-        model = genai.GenerativeModel(GEMINI_MODEL)
+        _genai = _get_genai()
+        model = _genai.GenerativeModel(GEMINI_MODEL)
         response = model.generate_content(
             [
                 {"role": "user", "parts": [{"text": SYSTEM_PROMPT}]},
                 {"role": "model", "parts": [{"text": "承知しました。JSON形式でEBPMに基づく予算案を作成します。"}]},
                 {"role": "user", "parts": [{"text": user_message}]},
             ],
-            generation_config=genai.GenerationConfig(
+            generation_config=_genai.GenerationConfig(
                 temperature=0.7,
                 max_output_tokens=8192,
             ),
